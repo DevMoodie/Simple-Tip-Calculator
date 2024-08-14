@@ -12,6 +12,14 @@ class TipCalculatorViewModel: ObservableObject {
     
     @Published var billAmount: String = ""
     @Published var tipPercentage: Int = 15
+    
+    @Published var numberOfPeopleDouble: Double = 1 // Use Double for Slider
+    
+    var numberOfPeople: Int {
+        get { Int(numberOfPeopleDouble) }
+        set { numberOfPeopleDouble = Double(newValue) }
+    }
+    
     @Published var savedCalculations: [Calculation] = []
     
     var tipPercentages = [10, 15, 20, 25, 30]
@@ -32,6 +40,12 @@ class TipCalculatorViewModel: ObservableObject {
         return String(format: "$%.2f", calculatorModel.totalAmount)
     }
     
+    var amountPerPersonFormatted: String {
+        let totalAmount = calculatorModel.totalAmount
+        let amountPerPerson = totalAmount / Double(max(numberOfPeople, 1)) // Avoid division by zero
+        return String(format: "$%.2f", amountPerPerson)
+    }
+    
     // Core Data Context
     private let context = PersistenceController.shared.container.viewContext
          
@@ -50,6 +64,10 @@ class TipCalculatorViewModel: ObservableObject {
         } catch {
             print("Failed to save calculation: \(error.localizedDescription)")
         }
+        
+        billAmount = ""
+        tipPercentage = 15
+        numberOfPeopleDouble = 1
     }
      
     // Fetch Saved Calculations
